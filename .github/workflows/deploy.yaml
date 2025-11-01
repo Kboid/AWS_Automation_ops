@@ -1,13 +1,18 @@
 name: Deploy Docker Container
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
+    inputs:
+      confirm_apply:
+        description: "Check to confirm you want to run terraform apply"
+        required: true
+        type: boolean
 
 jobs:
   terraform:
     runs-on: ubuntu-latest
+    environment:
+      name: production  # Must be set up in repo settings with required reviewers
 
     steps:
       - name: Checkout code
@@ -19,5 +24,6 @@ jobs:
       - name: Terraform Init
         run: terraform init
 
-      - name: Terraform Apply
+      - name: Conditional Terraform Apply
+        if: ${{ github.event.inputs.confirm_apply == 'true' }}
         run: terraform apply -auto-approve
