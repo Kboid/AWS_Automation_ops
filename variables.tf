@@ -1,3 +1,9 @@
-variable "region" {
-  default = "us-east-1"
+variable "key_name" {
+  description = "Name of the AWS key pair"
+  default     = "practise"
+}
+
+variable "public_key_path" {
+  description = "C:\Users\Admin\Desktop\practise.pem"
+  default     = "~/.ssh/id_rsa.pub"
 }

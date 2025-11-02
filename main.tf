@@ -1,10 +1,10 @@
 provider "aws" {
-  region = "us-east-1"
+  region = "var.region"
 }
 
 resource "aws_key_pair" "deployer" {
-  key_name   = "deployer-key"
-  public_key = file("~/.ssh/id_rsa.pub") # Adjust path to your public SSH key
+  key_name   = var.key_name
+  public_key = file(var.public_key_path) # Adjust path to your public SSH key
 }
 
 resource "aws_security_group" "nginx_sg" {
