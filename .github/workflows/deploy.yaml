@@ -1,4 +1,4 @@
-name: Deploy Docker Container
+name: Deploy orchestration
 
 on:
   workflow_dispatch:
