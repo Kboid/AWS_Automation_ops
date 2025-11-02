@@ -1,3 +1,17 @@
+name: Deploy Nginx_terraform
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_apply:
+        description: "Confirm to run terraform apply"
+        required: false
+        type: boolean
+      confirm_destroy:
+        description: "Confirm to run terraform destroy"
+        required: false
+        type: boolean
+
 jobs:
   deploy_and_destroy:
     runs-on: ubuntu-latest
