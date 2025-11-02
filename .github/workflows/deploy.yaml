@@ -1,20 +1,5 @@
-name: Deploy Nginx_terraform
-
-on:
-  workflow_dispatch:
-    inputs:
-      confirm_apply:
-        description: "Confirm to run terraform apply"
-        required: false
-        type: boolean
-      confirm_destroy:
-        description: "Confirm to run terraform destroy"
-        required: false
-        type: boolean
-
 jobs:
-  deploy:
-    if: ${{ github.event.inputs.confirm_apply == 'true' }}
+  deploy_and_destroy:
     runs-on: ubuntu-latest
     environment:
       name: production
@@ -40,33 +25,9 @@ jobs:
         run: terraform init
 
       - name: Terraform Apply
+        if: ${{ github.event.inputs.confirm_apply == 'true' }}
         run: terraform apply -auto-approve
 
-  destroy:
-    if: ${{ github.event.inputs.confirm_destroy == 'true' }}
-    runs-on: ubuntu-latest
-    environment:
-      name: production
-
-    env:
-      TF_VAR_public_key: ${{ secrets.PUBLIC_KEY }}
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v2
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-
-      - name: Terraform Init
-        run: terraform init
-
       - name: Terraform Destroy
+        if: ${{ github.event.inputs.confirm_destroy == 'true' }}
         run: terraform destroy -auto-approve
