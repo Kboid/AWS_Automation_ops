@@ -1,18 +1,25 @@
-name: Deploy orchestration
+name: Deploy Nginx_terraform
 
 on:
   workflow_dispatch:
     inputs:
       confirm_apply:
-        description: "Check to confirm you want to run terraform apply"
-        required: true
+        description: "Confirm to run terraform apply"
+        required: false
+        type: boolean
+      confirm_destroy:
+        description: "Confirm to run terraform destroy"
+        required: false
         type: boolean
 
 jobs:
-  terraform:
+  deploy_and_destroy:
     runs-on: ubuntu-latest
     environment:
-      name: production  # Must be set up in repo settings with required reviewers
+      name: production
+
+    env:
+      TF_VAR_public_key: ${{ secrets.PUBLIC_KEY }}
 
     steps:
       - name: Checkout code
@@ -21,9 +28,20 @@ jobs:
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
 
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
       - name: Terraform Init
         run: terraform init
 
-      - name: Conditional Terraform Apply
+      - name: Terraform Apply
         if: ${{ github.event.inputs.confirm_apply == 'true' }}
         run: terraform apply -auto-approve
+
+      - name: Terraform Destroy
+        if: ${{ github.event.inputs.confirm_destroy == 'true' }}
+        run: terraform destroy -auto-approve
